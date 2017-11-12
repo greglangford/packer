@@ -1,0 +1,11 @@
+###################################################################################################
+
+- name: rbenv | set version
+  become_user: '{{ ruby_build_user }}'
+  copy:
+    content: |
+      {{ ruby_version }}
+    dest: '~/.rbenv/version'
+  when: not ruby_check_binary.stat.exists
+
+###################################################################################################

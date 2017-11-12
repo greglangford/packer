@@ -1,0 +1,36 @@
+###################################################################################################
+
+- name: system | set facts
+  set_fact:
+    node_build_user           : '{{ node_system_build_user }}'
+    node_download_path        : '{{ node_system_download_path }}'
+    node_extract_path         : '{{ node_system_extract_path }}'
+    node_configure_command    : '{{ node_system_configure_command }}'
+    node_make_command         : '{{ node_system_make_command }}'
+    node_make_install_command : '{{ node_system_make_install_command }}'
+    node_bin_path             : '{{ node_system_bin_path }}'
+  when: node_install_type == 'system'
+
+###################################################################################################
+
+- name: local | set facts
+  set_fact:
+    node_build_user           : '{{ node_local_build_user }}'
+    node_download_path        : '{{ node_local_download_path }}'
+    node_extract_path         : '{{ node_local_extract_path }}'
+    node_configure_command    : '{{ node_local_configure_command }}'
+    node_make_command         : '{{ node_local_make_command }}'
+    node_make_install_command : '{{ node_local_make_install_command }}'
+    node_bin_path             : '{{ node_local_bin_path }}'
+  when: node_install_type == 'local'
+
+###################################################################################################
+
+- include: build.yml
+
+###################################################################################################
+
+- include: local.yml
+  when: node_install_type == 'local'
+
+###################################################################################################

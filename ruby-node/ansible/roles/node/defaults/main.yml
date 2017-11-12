@@ -1,0 +1,52 @@
+###################################################################################################
+
+node_dependencies:
+  - build-essential
+  - libssl-dev
+
+###################################################################################################
+
+node_install_type: system
+
+###################################################################################################
+
+node_major_version  : 8.9
+node_patch_version  : 1
+node_version        : '{{ node_major_version }}.{{ node_patch_version }}'
+
+###################################################################################################
+
+node_src_basename : 'node-v{{ node_version }}'
+node_src_filename : '{{ node_src_basename }}.tar.gz'
+node_src_baseurl  : https://nodejs.org/dist
+node_src_url      : '{{ node_src_baseurl }}/v{{ node_version }}/{{ node_src_filename }}'
+
+###################################################################################################
+
+node_system_download_path         : /usr/src
+node_system_extract_path          : '{{ node_system_download_path }}/{{ node_src_basename }}'
+node_system_build_user            : root
+node_system_configure_command     : ./configure
+node_system_make_command          : '{{ node_build_make_command }}'
+node_system_make_install_command  : '{{ node_build_make_install_command }}'
+node_system_bin_path              : '/usr/local/bin/node'
+
+###################################################################################################
+
+node_local_download_path          : ~/src
+node_local_extract_path           : '{{ node_local_download_path }}/{{ node_src_basename }}'
+node_local_build_user             : '{{ ansible_ssh_user }}'
+node_local_prefix_path            : '.local/node'
+node_local_configure_command      : './configure --prefix=$HOME/{{ node_local_prefix_path }}/{{ node_version }}'
+node_local_make_command           : '{{ node_build_make_command }}'
+node_local_make_install_command   : '{{ node_build_make_install_command }}'
+node_local_bin_path               : '~/{{ node_local_prefix_path }}/{{ node_version }}/bin/node'
+
+###################################################################################################
+
+node_build_threads              : 2
+node_build_cleanup              : false
+node_build_make_command         : 'make -j {{ node_build_threads }}'
+node_build_make_install_command : 'make install'
+
+###################################################################################################

@@ -1,0 +1,8 @@
+---
+- hosts: all
+  become: yes
+  roles:
+    - { role: swap  }
+    - { role: node, node_install_type: local, node_build_user: '{{ vagrant_user }}', node_build_cleanup: true }
+    - { role: ruby, ruby_install_type: rbenv, ruby_build_user: '{{ vagrant_user }}', rbenv_user: '{{ ruby_build_user }}', ruby_build_cleanup: true }
+    - { role: swap, swap_enable: false }

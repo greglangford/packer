@@ -1,0 +1,19 @@
+###################################################################################################
+
+- name: local | symlink
+  become_user: '{{ node_build_user }}'
+  file:
+    src: '~/{{ node_local_prefix_path }}/{{ node_version }}'
+    dest: '~/{{ node_local_prefix_path }}/current'
+    state: link
+
+###################################################################################################
+
+- name: local | update profile
+  become_user: '{{ node_build_user }}'
+  lineinfile:
+    destfile: .bashrc
+    line: 'export PATH=$HOME/{{ node_local_prefix_path }}/current/bin:$PATH'
+    insertafter: EOF
+
+###################################################################################################

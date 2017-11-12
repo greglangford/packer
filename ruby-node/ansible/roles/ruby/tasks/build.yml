@@ -1,0 +1,85 @@
+###################################################################################################
+
+- name: dependencies
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ ruby_dependencies }}'
+
+###################################################################################################
+
+- name: check
+  become_user: '{{ ruby_build_user }}'
+  stat:
+    path: '{{ ruby_bin_path }}'
+  register: ruby_check_binary
+
+###################################################################################################
+
+- name: directory
+  become_user: '{{ ruby_build_user }}'
+  file:
+    path: '{{ ruby_download_path }}'
+    state: directory
+  when: not ruby_check_binary.stat.exists
+
+###################################################################################################
+
+- name: download
+  become_user: '{{ ruby_build_user }}'
+  get_url:
+    url: '{{ ruby_src_url }}'
+    dest: '{{ ruby_download_path }}/{{ ruby_src_filename }}'
+  register: ruby_download
+  when: not ruby_check_binary.stat.exists
+
+###################################################################################################
+
+- name: extract
+  become_user: '{{ ruby_build_user }}'
+  command: 'tar xvf {{ ruby_src_filename }} -o {{ ruby_src_basename }}'
+  args:
+    chdir: '{{ ruby_download_path }}'
+    warn: false
+  when: ruby_download.changed and not ruby_check_binary.stat.exists
+
+###################################################################################################
+
+- name: configure
+  become_user: '{{ ruby_build_user }}'
+  command: '{{ ruby_configure_command }}'
+  args:
+    chdir: '{{ ruby_extract_path }}'
+  when: not ruby_check_binary.stat.exists
+
+###################################################################################################
+
+- name: compile
+  become_user: '{{ ruby_build_user }}'
+  command: '{{ ruby_make_command }}'
+  args:
+    chdir: '{{ ruby_extract_path }}'
+  when: not ruby_check_binary.stat.exists
+
+###################################################################################################
+
+- name: install
+  become_user: '{{ ruby_build_user }}'
+  command: '{{ ruby_make_install_command }}'
+  args:
+    chdir: '{{ ruby_extract_path }}'
+  when: not ruby_check_binary.stat.exists
+
+###################################################################################################
+
+- name: cleanup
+  become_user: '{{ ruby_build_user }}'
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - '{{ ruby_extract_path }}'
+    - '{{ ruby_download_path }}/{{ ruby_src_filename }}'
+  when: ruby_build_cleanup and not ruby_check_binary.stat.exists
+
+###################################################################################################

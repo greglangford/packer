@@ -1,0 +1,84 @@
+###################################################################################################
+
+- name: dependencies
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ node_dependencies }}'
+
+###################################################################################################
+
+- name: check
+  become_user: '{{ node_build_user }}'
+  stat:
+    path: '{{ node_bin_path }}'
+  register: node_check_binary
+
+###################################################################################################
+
+- name: directory
+  become_user: '{{ node_build_user }}'
+  file:
+    path: '{{ node_download_path }}'
+    state: directory
+  when: not node_check_binary.stat.exists
+
+###################################################################################################
+
+- name: download
+  become_user: '{{ node_build_user }}'
+  get_url:
+    url: '{{ node_src_url }}'
+    dest: '{{ node_download_path }}/{{ node_src_filename }}'
+  when: not node_check_binary.stat.exists
+
+###################################################################################################
+
+- name: extract
+  become_user: '{{ node_build_user }}'
+  command: 'tar xvf {{ node_src_filename }} -o {{ node_src_basename }}'
+  args:
+    chdir: '{{ node_download_path }}'
+    warn: false
+  when: not node_check_binary.stat.exists
+
+###################################################################################################
+
+- name: configure
+  become_user: '{{ node_build_user }}'
+  command: '{{ node_configure_command }}'
+  args:
+    chdir: '{{ node_extract_path }}'
+  when: not node_check_binary.stat.exists
+
+###################################################################################################
+
+- name: compile
+  become_user: '{{ node_build_user }}'
+  command: '{{ node_make_command }}'
+  args:
+    chdir: '{{ node_extract_path }}'
+  when: not node_check_binary.stat.exists
+
+###################################################################################################
+
+- name: install
+  become_user: '{{ node_build_user }}'
+  command: '{{ node_make_install_command }}'
+  args:
+    chdir: '{{ node_extract_path }}'
+  when: not node_check_binary.stat.exists
+
+###################################################################################################
+
+- name: cleanup
+  become_user: '{{ node_build_user }}'
+  file:
+    path: '{{ item }}'
+    state: absent
+  with_items:
+    - '{{ node_extract_path }}'
+    - '{{ node_download_path }}/{{ node_src_filename }}'
+  when: node_build_cleanup and not node_check_binary.stat.exists 
+
+###################################################################################################

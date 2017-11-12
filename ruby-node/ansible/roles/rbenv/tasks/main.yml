@@ -1,0 +1,45 @@
+###################################################################################################
+
+- name: dependencies
+  apt:
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ rbenv_dependencies }}'
+
+###################################################################################################
+
+- name: clone
+  become_user: '{{ rbenv_user }}'
+  git:
+    repo: '{{ rbenv_repo }}'
+    dest: ~/.rbenv
+  register: rbenv_clone
+
+###################################################################################################
+
+- name: compile
+  become_user: '{{ rbenv_user }}'
+  command: src/configure && make -C src
+  args:
+    chdir: ~/.rbenv
+  when: rbenv_clone.changed
+
+###################################################################################################
+
+- name: profile path
+  become_user: '{{ rbenv_user }}'
+  lineinfile:
+    destfile: .bashrc
+    line: 'export PATH=$HOME/.rbenv/bin:$PATH'
+    insertafter: EOF
+
+###################################################################################################
+
+- name: profile init
+  become_user: '{{ rbenv_user }}'
+  lineinfile:
+    destfile: .bashrc
+    line: 'eval "$(rbenv init -)"'
+    insertafter: EOF
+
+###################################################################################################

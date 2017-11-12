@@ -1,0 +1,61 @@
+###################################################################################################
+
+ruby_dependencies:
+  - build-essential
+  - libssl-dev
+  - libyaml-dev
+  - libxml2-dev
+  - libreadline6-dev
+  - zlib1g-dev
+  - libncurses5-dev
+  - libffi-dev
+  - libgdbm3
+  - libgdbm-dev
+  - libsqlite3-dev
+
+###################################################################################################
+
+ruby_install_type: system
+
+###################################################################################################
+
+ruby_major_version    : 2.4
+ruby_patch_version    : 2
+ruby_version          : '{{ ruby_major_version }}.{{ ruby_patch_version }}'
+
+###################################################################################################
+
+ruby_src_basename : 'ruby-{{ ruby_version }}'
+ruby_src_filename : '{{ ruby_src_basename }}.tar.gz'
+ruby_src_baseurl  : https://cache.ruby-lang.org/pub/ruby
+ruby_src_url      : '{{ ruby_src_baseurl }}/{{ ruby_major_version }}/{{ ruby_src_filename }}'
+
+###################################################################################################
+
+ruby_system_download_path         : /usr/src
+ruby_system_extract_path          : '{{ ruby_system_download_path }}/{{ ruby_src_basename }}'
+ruby_system_build_user            : root
+ruby_system_configure_command     : './configure --enable-shared'
+ruby_system_make_command          : '{{ ruby_build_make_command }}'
+ruby_system_make_install_command  : '{{ ruby_build_make_install_command }}'
+ruby_system_bin_path              : '/usr/local/bin/ruby'
+
+###################################################################################################
+
+ruby_rbenv_download_path         : ~/src
+ruby_rbenv_extract_path          : '{{ ruby_rbenv_download_path }}/{{ ruby_src_basename }}'
+ruby_rbenv_build_user            : '{{ ansible_ssh_user }}'
+ruby_rbenv_prefix_path           : '.rbenv/versions/{{ ruby_version }}'
+ruby_rbenv_configure_command     : './configure --prefix=$HOME/{{ ruby_rbenv_prefix_path }} --enable-shared'
+ruby_rbenv_make_command          : '{{ ruby_build_make_command }}'
+ruby_rbenv_make_install_command  : '{{ ruby_build_make_install_command }}'
+ruby_rbenv_bin_path              : '{{ ruby_rbenv_prefix_path }}/bin/ruby'
+
+###################################################################################################
+
+ruby_build_threads              : 2
+ruby_build_cleanup              : false
+ruby_build_make_command         : 'make -j {{ ruby_build_threads }}'
+ruby_build_make_install_command : 'make install'
+
+###################################################################################################

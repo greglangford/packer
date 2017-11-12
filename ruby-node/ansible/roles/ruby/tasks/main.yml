@@ -1,0 +1,36 @@
+###################################################################################################
+
+- name: system | set facts
+  set_fact:
+    ruby_build_user           : '{{ ruby_system_build_user }}'
+    ruby_download_path        : '{{ ruby_system_download_path }}'
+    ruby_extract_path         : '{{ ruby_system_extract_path }}'
+    ruby_configure_command    : '{{ ruby_system_configure_command }}'
+    ruby_make_command         : '{{ ruby_system_make_command }}'
+    ruby_make_install_command : '{{ ruby_system_make_install_command }}'
+    ruby_bin_path             : '{{ ruby_system_bin_path }}'
+  when: ruby_install_type == 'system'
+
+###################################################################################################
+
+- name: rbenv | set facts
+  set_fact:
+    ruby_build_user           : '{{ ruby_rbenv_build_user }}'
+    ruby_download_path        : '{{ ruby_rbenv_download_path }}'
+    ruby_extract_path         : '{{ ruby_rbenv_extract_path }}'
+    ruby_configure_command    : '{{ ruby_rbenv_configure_command }}'
+    ruby_make_command         : '{{ ruby_rbenv_make_command }}'
+    ruby_make_install_command : '{{ ruby_rbenv_make_install_command }}'
+    ruby_bin_path             : '{{ ruby_rbenv_bin_path }}'
+  when: ruby_install_type == 'rbenv'
+
+###################################################################################################
+
+- include: build.yml
+
+###################################################################################################
+
+- include: rbenv.yml
+  when: ruby_install_type == 'rbenv'
+
+###################################################################################################
